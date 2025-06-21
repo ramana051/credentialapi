@@ -1,0 +1,196 @@
+version: '3.8'
+
+services:
+  # Database
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: digital_credentials
+      POSTGRES_USER: dcp_user
+      POSTGRES_PASSWORD: dcp_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    networks:
+      - dcp-network
+
+  # Redis for caching and session management
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - dcp-network
+
+  # API Gateway
+  api-gateway:
+    build:
+      context: ./backend/api-gateway
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://dcp_user:dcp_password@postgres:5432/digital_credentials
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET_KEY=your-super-secret-jwt-key-change-in-production
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - dcp-network
+
+  # User Management Service
+  user-management:
+    build:
+      context: ./backend/user-management
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8000"
+    environment:
+      - DATABASE_URL=postgresql://dcp_user:dcp_password@postgres:5432/digital_credentials
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET_KEY=your-super-secret-jwt-key-change-in-production
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - dcp-network
+
+  # Credential Issuance Service
+  credential-issuance:
+    build:
+      context: ./backend/credential-issuance
+      dockerfile: Dockerfile
+    ports:
+      - "8002:8000"
+    environment:
+      - DATABASE_URL=postgresql://dcp_user:dcp_password@postgres:5432/digital_credentials
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - dcp-network
+
+  # Verification Service
+  verification:
+    build:
+      context: ./backend/verification
+      dockerfile: Dockerfile
+    ports:
+      - "8003:8000"
+    environment:
+      - DATABASE_URL=postgresql://dcp_user:dcp_password@postgres:5432/digital_credentials
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - dcp-network
+
+  # Design Studio Service
+  design-studio:
+    build:
+      context: ./backend/design-studio
+      dockerfile: Dockerfile
+    ports:
+      - "8004:8000"
+    environment:
+      - DATABASE_URL=postgresql://dcp_user:dcp_password@postgres:5432/digital_credentials
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - dcp-network
+
+  # Recipient Portal Service
+  recipient-portal:
+    build:
+      context: ./backend/recipient-portal
+      dockerfile: Dockerfile
+    ports:
+      - "8005:8000"
+    environment:
+      - DATABASE_URL=postgresql://dcp_user:dcp_password@postgres:5432/digital_credentials
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - dcp-network
+
+  # Analytics Service
+  analytics:
+    build:
+      context: ./backend/analytics
+      dockerfile: Dockerfile
+    ports:
+      - "8006:8000"
+    environment:
+      - DATABASE_URL=postgresql://dcp_user:dcp_password@postgres:5432/digital_credentials
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - dcp-network
+
+  # Integration Service
+  integration:
+    build:
+      context: ./backend/integration
+      dockerfile: Dockerfile
+    ports:
+      - "8007:8000"
+    environment:
+      - DATABASE_URL=postgresql://dcp_user:dcp_password@postgres:5432/digital_credentials
+      - REDIS_URL=redis://redis:6379
+      - SENDGRID_API_KEY=your-sendgrid-api-key
+      - TWILIO_ACCOUNT_SID=your-twilio-account-sid
+      - TWILIO_AUTH_TOKEN=your-twilio-auth-token
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - dcp-network
+
+  # Notification Service
+  notification:
+    build:
+      context: ./backend/notification
+      dockerfile: Dockerfile
+    ports:
+      - "8008:8000"
+    environment:
+      - DATABASE_URL=postgresql://dcp_user:dcp_password@postgres:5432/digital_credentials
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - dcp-network
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    depends_on:
+      - api-gateway
+    networks:
+      - dcp-network
+
+volumes:
+  postgres_data:
+
+networks:
+  dcp-network:
+    driver: bridge
+

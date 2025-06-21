@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credential Verification - Digital Credentials Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Digital Credential Verification</h1>
+            <p class="text-gray-600">Verify the authenticity of digital credentials</p>
+        </div>
+
+        <!-- Verification Result -->
+        <div class="max-w-4xl mx-auto">
+            <!-- Success Badge -->
+            <div class="bg-white rounded-lg shadow-lg p-8 mb-6">
+                <div class="text-center mb-6">
+                    {% if credential.is_valid %}
+                    <div class="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
+                        <i class="fas fa-check-circle text-3xl text-green-600"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-green-600 mb-2">Credential Verified</h2>
+                    <p class="text-gray-600">This credential is authentic and valid</p>
+                    {% else %}
+                    <div class="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-4">
+                        <i class="fas fa-times-circle text-3xl text-red-600"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-red-600 mb-2">Verification Failed</h2>
+                    <p class="text-gray-600">This credential could not be verified</p>
+                    {% endif %}
+                </div>
+
+                <!-- Credential Information -->
+                <div class="border-t pt-6">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <!-- Left Column -->
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Credential Details</h3>
+                            
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-500">Title</label>
+                                    <p class="text-gray-900">{{ credential.title }}</p>
+                                </div>
+                                
+                                {% if credential.description %}
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-500">Description</label>
+                                    <p class="text-gray-900">{{ credential.description }}</p>
+                                </div>
+                                {% endif %}
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-500">Recipient</label>
+                                    <p class="text-gray-900">{{ credential.recipient_name }}</p>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-500">Credential ID</label>
+                                    <p class="text-gray-900 font-mono text-sm">{{ credential.credential_id }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column -->
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Issuer Information</h3>
+                            
+                            <div class="space-y-3">
+                                {% if credential.organization_logo %}
+                                <div>
+                                    <img src="{{ credential.organization_logo }}" alt="Organization Logo" class="h-12 w-auto">
+                                </div>
+                                {% endif %}
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-500">Organization</label>
+                                    <p class="text-gray-900">{{ credential.organization_name }}</p>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-500">Issued By</label>
+                                    <p class="text-gray-900">{{ credential.issuer_name }}</p>
+                                </div>
+                                
+                                {% if credential.issued_at %}
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-500">Issue Date</label>
+                                    <p class="text-gray-900">{{ credential.issued_at.strftime('%B %d, %Y') }}</p>
+                                </div>
+                                {% endif %}
+                                
+                                {% if credential.expires_at %}
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-500">Expiration Date</label>
+                                    <p class="text-gray-900">{{ credential.expires_at.strftime('%B %d, %Y') }}</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Verification Details -->
+                {% if credential.verification_details %}
+                <div class="border-t pt-6 mt-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Verification Details</h3>
+                    
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        {% if credential.verification_details.checks_performed %}
+                        <div class="mb-4">
+                            <h4 class="font-medium text-gray-900 mb-2">Checks Performed</h4>
+                            <ul class="list-disc list-inside text-sm text-gray-600">
+                                {% for check in credential.verification_details.checks_performed %}
+                                <li>{{ check.replace('_', ' ').title() }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                        
+                        {% if credential.verification_details.warnings %}
+                        <div class="mb-4">
+                            <h4 class="font-medium text-yellow-700 mb-2">
+                                <i class="fas fa-exclamation-triangle mr-1"></i>
+                                Warnings
+                            </h4>
+                            <ul class="list-disc list-inside text-sm text-yellow-600">
+                                {% for warning in credential.verification_details.warnings %}
+                                <li>{{ warning }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                        
+                        {% if credential.verification_details.errors %}
+                        <div>
+                            <h4 class="font-medium text-red-700 mb-2">
+                                <i class="fas fa-times-circle mr-1"></i>
+                                Errors
+                            </h4>
+                            <ul class="list-disc list-inside text-sm text-red-600">
+                                {% for error in credential.verification_details.errors %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Actions -->
+                <div class="border-t pt-6 mt-6">
+                    <div class="flex flex-wrap gap-4">
+                        {% if credential.json_ld %}
+                        <a href="/api/credential/{{ credential.credential_id }}/json-ld" 
+                           class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                            <i class="fas fa-code mr-2"></i>
+                            View JSON-LD
+                        </a>
+                        {% endif %}
+                        
+                        <button onclick="shareCredential()" 
+                                class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+                            <i class="fas fa-share mr-2"></i>
+                            Share
+                        </button>
+                        
+                        <button onclick="window.print()" 
+                                class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+                            <i class="fas fa-print mr-2"></i>
+                            Print
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Information -->
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div class="flex items-start">
+                    <i class="fas fa-info-circle text-blue-600 mt-1 mr-3"></i>
+                    <div>
+                        <h4 class="font-medium text-blue-900">About Credential Verification</h4>
+                        <p class="text-blue-700 text-sm mt-1">
+                            This verification confirms the authenticity and current validity of the digital credential. 
+                            The verification process checks the credential status, expiration date, issuer validity, 
+                            and data integrity.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function shareCredential() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Digital Credential Verification',
+                    text: 'Verified credential: {{ credential.title }}',
+                    url: window.location.href
+                });
+            } else {
+                // Fallback: copy to clipboard
+                navigator.clipboard.writeText(window.location.href).then(() => {
+                    alert('Verification URL copied to clipboard!');
+                });
+            }
+        }
+    </script>
+</body>
+</html>
+

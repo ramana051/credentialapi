@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verification Error - Digital Credentials Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Digital Credential Verification</h1>
+            <p class="text-gray-600">Verify the authenticity of digital credentials</p>
+        </div>
+
+        <!-- Error Message -->
+        <div class="max-w-2xl mx-auto">
+            <div class="bg-white rounded-lg shadow-lg p-8 text-center">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-4">
+                    <i class="fas fa-exclamation-triangle text-3xl text-red-600"></i>
+                </div>
+                
+                <h2 class="text-2xl font-bold text-red-600 mb-4">Verification Failed</h2>
+                
+                <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                    <p class="text-red-700">{{ error }}</p>
+                </div>
+                
+                {% if credential_id %}
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-500 mb-1">Credential ID</label>
+                    <p class="text-gray-900 font-mono text-sm">{{ credential_id }}</p>
+                </div>
+                {% endif %}
+                
+                <div class="space-y-4">
+                    <p class="text-gray-600">
+                        The credential you're trying to verify could not be found or is invalid. 
+                        Please check the credential ID and try again.
+                    </p>
+                    
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                        <button onclick="history.back()" 
+                                class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+                            <i class="fas fa-arrow-left mr-2"></i>
+                            Go Back
+                        </button>
+                        
+                        <a href="/" 
+                           class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                            <i class="fas fa-home mr-2"></i>
+                            Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Help Section -->
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-6">
+                <div class="flex items-start">
+                    <i class="fas fa-question-circle text-blue-600 mt-1 mr-3"></i>
+                    <div>
+                        <h4 class="font-medium text-blue-900">Need Help?</h4>
+                        <p class="text-blue-700 text-sm mt-1">
+                            If you believe this is an error, please contact the credential issuer 
+                            or our support team for assistance.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
