@@ -4,6 +4,11 @@ Credential Issuance Service
 This service handles the creation, management, and issuance of digital credentials.
 It provides both API endpoints and business logic for credential operations.
 """
+from fastapi import FastAPI
+
+app = FastAPI()
+
+# Define routes here
 
 from fastapi import FastAPI, Depends, HTTPException, status, UploadFile, File, Form, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
